@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/@zxing/library@0.18.3/umd/index.min.js"></script>
+    <title>PDF417 Barcode Decoder</title>
+  </head>
+  <body>
+    <form>
+      <input type="file" id="inputImage" accept="image/*" />
+    </form>
+    <div id="result"></div>
+
+    <script>
+      const inputImage = document.getElementById("inputImage");
+      const result = document.getElementById("result");
+      // part 1 for return data as table
+      //       inputImage.addEventListener('change', async (event) => {
+      //   const file = event.target.files[0];
+      //   if (!file) {
+      //     return;
+      //   }
+
+      //   const image = await readImageFile(file);
+      //   const decoded = await decodeBarcode(image);
+      //   if (decoded) {
+      //     const table = createTableFromCSV(decoded);
+      //     result.innerHTML = '';
+      //     result.appendChild(table);
+      //   } else {
+      //     result.textContent = 'No barcode detected';
+      //   }
+      // });
+      inputImage.addEventListener("change", async (event) => {
+        const file = event.target.files[0];
+        if (!file) {
+          return;
+        }
+
+        const image = await readImageFile(file);
+        const decoded = await decodeBarcode(image);
+        if (decoded) {
+          const jsonData = csvToJson(decoded);
+          result.textContent = JSON.stringify(jsonData, null, 2);
+        } else {
+          result.textContent = "No barcode detected";
+        }
+      });
+
+      async function readImageFile(file) {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const image = new Image();
+            image.src = event.target.result;
+            image.onload = () => resolve(image);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      async function decodeBarcode(image) {
+        try {
+          const { BrowserPDF417Reader } = window.ZXing;
+          const codeReader = new BrowserPDF417Reader();
+          const result = await codeReader.decodeFromImage(image);
+          return result.text;
+        } catch (error) {
+          console.error("Failed to decode barcode", error);
+          return null;
+        }
+      }
+      // part 2 for return data as table
+      // function createTableFromCSV(csvData) {
+      //   const table = document.createElement("table");
+      //   const rows = csvData.split("\n");
+
+      //   rows.forEach((row) => {
+      //     const tableRow = document.createElement("tr");
+      //     const values = row.split(",");
+
+      //     values.forEach((value) => {
+      //       const tableCell = document.createElement("td");
+      //       tableCell.textContent = value;
+      //       tableRow.appendChild(tableCell);
+      //     });
+
+      //     table.appendChild(tableRow);
+      //   });
+
+      //   return table;
+      // }
+
+      // return data as JSON
+      function csvToJson(csvData) {
+        const rows = csvData.split("\n");
+        const headers = rows.shift().split(",");
+
+        return rows.map((row) => {
+          const rowData = row.split(",");
+          return headers.reduce((jsonObj, header, index) => {
+            jsonObj[header] = rowData[index];
+            return jsonObj;
+          }, {});
+        });
+      }
+    </script>
+  </body>
+</html>
