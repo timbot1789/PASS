@@ -32,6 +32,8 @@
       //     result.textContent = 'No barcode detected';
       //   }
       // });
+
+      //part 1 for return data as JSON
       inputImage.addEventListener("change", async (event) => {
         const file = event.target.files[0];
         if (!file) {
@@ -92,7 +94,7 @@
       //   return table;
       // }
 
-      // return data as JSON
+      // part 2 return data as JSON
       function csvToJson(csvData) {
         const rows = csvData.split("\n");
         const headers = rows.shift().split(",");
@@ -108,3 +110,33 @@
     </script>
   </body>
 </html>
+
+
+<!-- license field codes -->
+<!-- DCA: Vehicle class(es) the cardholder is allowed to drive
+DCB: Restrictions on driving privileges (e.g., only automatic transmission)
+DCD: Additional privileges granted to the cardholder (e.g., transportation of hazardous material)
+DBA: Expiration date of the document
+DCS: Last name
+DAC: First name
+DAD: Middle name(s)
+DBD: Issue date of the document
+DBB: Date of birth
+DBC: Gender
+DAY: Eye color
+DAU: Height
+DAG: Address: Street name
+DAI: Address: City name
+DAJ: Address: State name
+DAK: Address: Postal code
+DAQ: ID number of the cardholder
+DCF: ID number of the document
+DCG: Country in which the document was issued
+DDE: Indicator that the last name is truncated
+DDF: Indicator that the first name is truncated
+DDG: Indicator that the middle name(s) are truncated -->
+
+<!-- https://scanbot.io/developer/javascript-barcode-scanner/ -->
+<!-- https://dcm.uhcl.edu/caps7g8/Drivers%20License.pdf -->
+<!-- https://scanbot.io/blog/drivers-license-barcode-parser/ -->
+<!-- https://github.com/PDF417/pdf417-android/blob/master/DriversLicenseKeys.md -->
