@@ -119,11 +119,13 @@ You can change the port the server is listening on by using the `--port` or `-p`
 npm run dev:pod -- -p 1234
 ```
 
-By default, community solid server stores all data in memory (i.e. it does not save data when it's shut down). To have it store data to your current folder, you can use 
+By default, community solid server stores all data in memory (i.e. it does not save data when it's shut down). To have it store data to your filesystem, you can use the command
 
  ```shell
-npm run dev:pod -- -c @css:config/file.json
+npm run dev:pod:stored
  ```
+
+This will store all server files in the folder `PASS/local_temp_server_files`. This is a local testing directory, and the files within it should not be added to source control.
 
 You can find more information on its configuration on the project's [github](https://github.com/CommunitySolidServer/CommunitySolidServer#configuring-the-server).
 

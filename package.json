@@ -13,7 +13,8 @@
     "lint:fix": "eslint --fix \"src/**/*.js[x]\"",
     "prettier:check": "prettier --check src/**/*.js src/**/*.jsx",
     "prettier:run": "prettier --write src/**/*.js --write src/**/*.jsx",
-    "dev:pod": "community-solid-server"
+    "dev:pod": "community-solid-server -c @css:config/file.json -f local_temp_server_files/",
+    "dev:pod:stored": "community-solid-server -c @css:config/file.json -f local_temp_server_files/"
   },
   "keywords": [],
   "author": "",
