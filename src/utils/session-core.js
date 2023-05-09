@@ -19,7 +19,6 @@ import {
   removeThing,
   getDatetime
 } from '@inrupt/solid-client';
-import { SCHEMA_INRUPT } from '@inrupt/vocab-common-rdf';
 import {
   getContainerUrl,
   setupAcl,
@@ -28,9 +27,9 @@ import {
   hasTTLFiles,
   createDocAclForUser,
   updateTTLFile,
+  createResourceTtlFile,
   SOLID_IDENTITY_PROVIDER
 } from './session-helper';
-
 /**
  * @typedef {import('@inrupt/solid-ui-react').SessionContext} Session
  */
@@ -152,11 +151,8 @@ export const setDocContainerAclPermission = async (session, accessType, otherPod
  * other user, set to an empty string by default
  * @returns {Promise} Promise - File upload is handled via Solid libraries
  */
-
-// Main function to upload document to user's Pod on Solid
 export const uploadDocument = async (session, uploadType, fileObject, otherPodUsername = '') => {
   let containerUrl;
-  const fileName = fileObject.file.name;
   if (uploadType === 'self') {
     containerUrl = getContainerUrl(session, fileObject.type, 'self-fetch');
   } else {
@@ -166,7 +162,6 @@ export const uploadDocument = async (session, uploadType, fileObject, otherPodUs
 
   await createContainerAt(containerUrl, { fetch: session.fetch });
 
-  const documentUrl = `${containerUrl}${fileName.replace(' ', '%20')}`;
   const datasetFromUrl = await getSolidDataset(containerUrl, { fetch: session.fetch });
   const ttlFileExists = hasTTLFiles(datasetFromUrl);
 
@@ -177,25 +172,12 @@ export const uploadDocument = async (session, uploadType, fileObject, otherPodUs
 
   // Place file into Pod container and generate new ttl file for container
   await placeFileInContainer(session, fileObject, containerUrl);
-  const newTtlFile = buildThing(createThing({ name: 'document' }))
-    .addDatetime('https://schema.org/uploadDate', new Date())
-    .addStringNoLocale(SCHEMA_INRUPT.name, fileObject.file.name)
-    .addStringNoLocale(SCHEMA_INRUPT.identifier, fileObject.type)
-    .addStringNoLocale(SCHEMA_INRUPT.endDate, fileObject.date)
-    .addStringNoLocale(SCHEMA_INRUPT.description, fileObject.description)
-    .addUrl(SCHEMA_INRUPT.url, documentUrl)
-    .build();
 
-  // const clientInfoThing = buildThing(createThing({ name: 'owner' }))
-  //   .addStringNoLocale(SCHEMA_INRUPT.givenName, 'Alice')
-  //   .addStringNoLocale(SCHEMA_INRUPT.familyName, 'Young')
-  //   .addUrl('https://schema.org/owns', documentUrl)
-  //   .addUrl(SCHEMA_INRUPT.url, 'https://testuser.opencommons.net/profile/card#me')
-  //   .build();
+  const documentUrl = `${containerUrl}${fileObject.file.name.replace(' ', '%20')}`;
+  const newTtlFile = createResourceTtlFile(fileObject, documentUrl);
 
   let newSolidDataset = createSolidDataset();
   newSolidDataset = setThing(newSolidDataset, newTtlFile);
-  // newSolidDataset = setThing(newSolidDataset, clientInfoThing);
 
   // Generate document.ttl file for container
   await saveSolidDatasetInContainer(containerUrl, newSolidDataset, {
