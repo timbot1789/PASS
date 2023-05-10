@@ -1,9 +1,10 @@
 import React from 'react';
 import { useSession } from '@inrupt/solid-ui-react';
 import { useField, useStatusNotification } from '../../hooks';
-import { uploadDocument, updateDocument, runNotification } from '../../utils';
+import UPLOAD_TYPES from '../../constants/upload-types';
 import DocumentSelection from './DocumentSelection';
 import FormSection from './FormSection';
+import { makeHandleFormSubmission } from './formSubmissionHelper'; 
 
 /**
  * UploadDocumentForm Component - Component that generates the form for uploading
@@ -29,86 +30,16 @@ const UploadDocumentForm = () => {
   // Custom useField hook for handling form inputs
   const { clearValue: clearDescription, _type, ...description } = useField('textarea');
 
-  const clearInputFields = () => {
+  const clearInputFields = (event) => {
+    event.target.uploadDoctype.value = '';
+    event.target.date.value = '';
     clearDescription();
     dispatch({ type: 'CLEAR_FILE' });
     dispatch({ type: 'CLEAR_PROCESSING' });
   };
 
   // Event handler for form/document submission to Pod
-  const handleFormSubmission = async (event) => {
-    event.preventDefault();
-    dispatch({ type: 'SET_PROCESSING' });
-    const docType = event.target.document.value;
-    const expirationDate = event.target.date.value;
-    const docDescription = event.target.description.value;
-
-    if (!state.file) {
-      runNotification('Submission failed. Reason: missing file', 5, state, dispatch);
-      setTimeout(() => {
-        dispatch({ type: 'CLEAR_PROCESSING' });
-      }, 3000);
-      return;
-    }
-
-    const fileObject = {
-      type: docType,
-      date: expirationDate || 'Not available',
-      description: docDescription || 'No description provided',
-      file: state.file
-    };
-
-    const fileName = fileObject.file.name;
-
-    try {
-      await uploadDocument(session, 'self', fileObject);
-
-      runNotification(`Uploading "${fileName}" to Solid...`, 3, state, dispatch);
-
-      // setTimeout is used to let uploadDocument finish its upload to user's Pod
-      setTimeout(() => {
-        runNotification(`File "${fileName}" uploaded to Solid.`, 5, state, dispatch);
-        setTimeout(() => {
-          event.target.uploadDoctype.value = '';
-          event.target.date.value = '';
-          clearInputFields();
-        }, 3000);
-      }, 3000);
-    } catch {
-      try {
-        const fileExist = await updateDocument(session, 'self', fileObject);
-
-        runNotification('Updating contents in Solid Pod...', 3, state, dispatch);
-
-        if (fileExist) {
-          setTimeout(() => {
-            runNotification(`File "${fileName}" updated on Solid.`, 5, state, dispatch);
-            setTimeout(() => {
-              event.target.uploadDoctype.value = '';
-              event.target.date.value = '';
-              clearInputFields();
-            }, 3000);
-          }, 3000);
-        } else {
-          setTimeout(() => {
-            runNotification(`File "${fileName}" uploaded on Solid.`, 5, state, dispatch);
-            setTimeout(() => {
-              event.target.uploadDoctype.value = '';
-              event.target.date.value = '';
-              clearInputFields();
-            }, 3000);
-          }, 3000);
-        }
-      } catch (error) {
-        runNotification(`Operation failed. Reason: ${error.message}`, 5, state, dispatch);
-        setTimeout(() => {
-          event.target.uploadDoctype.value = '';
-          event.target.date.value = '';
-          clearInputFields();
-        }, 3000);
-      }
-    }
-  };
+  const handleFormSubmission = makeHandleFormSubmission(UPLOAD_TYPES.SELF, state, dispatch, session, clearInputFields);
 
   const formRowStyle = {
     margin: '20px 0'

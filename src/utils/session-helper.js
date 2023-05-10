@@ -6,12 +6,13 @@ import {
   setAgentResourceAccess,
   saveAclFor,
   setAgentDefaultAccess,
+  createThing,
   buildThing,
   setThing,
   saveSolidDatasetAt
 } from '@inrupt/solid-client';
 import sha256 from 'crypto-js/sha256'
-import RDF_PREDICATES from '../constants/rdf_predicates';
+import RDF_PREDICATES from '../constants/rdf-predicates';
 
 /**
  * @typedef {import('@inrupt/solid-client').Access} Access
@@ -261,23 +262,23 @@ export const updateTTLFile = async (session, containerUrl, fileObject) => {
  * @param {documentUrl} String - url of uploaded document or resource
  * @returns {object} 
  */
-export const createResourceTtlFile = (fileObject, documentUrl) => {
-  let checksum = createFileChecksum(fileObject);
+export const createResourceTtlFile = async (fileObject, documentUrl) => {
+  let checksum = await createFileChecksum(fileObject);
 
   return buildThing(createThing({ name: 'document' }))
     .addDatetime(RDF_PREDICATES.uploadDate, new Date())
     .addStringNoLocale(RDF_PREDICATES.name, fileObject.file.name)
     .addStringNoLocale(RDF_PREDICATES.identifier, fileObject.type)
     .addStringNoLocale(RDF_PREDICATES.endDate, fileObject.date)
-    .addStringNoLocale(RDF_PREDICATES.checksum, checksum)
+    .addStringNoLocale(RDF_PREDICATES.serialNumber, checksum)
     .addStringNoLocale(RDF_PREDICATES.description, fileObject.description)
     .addUrl(RDF_PREDICATES.url, documentUrl)
     .build();
 }
 
-const createFileChecksum = (fileObject) => {
+const createFileChecksum = async (fileObject) => {
   const file = fileObject.file;
 
-  const firstMB = file.slice(0, 1000000) // only hash the first megabyte
-  return sha256(firstMB);
+  const text = await file.text(); // only hash the first megabyte
+  return sha256(text);
 }

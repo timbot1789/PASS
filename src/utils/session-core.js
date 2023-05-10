@@ -30,6 +30,8 @@ import {
   createResourceTtlFile,
   SOLID_IDENTITY_PROVIDER
 } from './session-helper';
+
+import UPLOAD_TYPES from '../constants/upload-types';
 /**
  * @typedef {import('@inrupt/solid-ui-react').SessionContext} Session
  */
@@ -152,8 +154,9 @@ export const setDocContainerAclPermission = async (session, accessType, otherPod
  * @returns {Promise} Promise - File upload is handled via Solid libraries
  */
 export const uploadDocument = async (session, uploadType, fileObject, otherPodUsername = '') => {
+  try{
   let containerUrl;
-  if (uploadType === 'self') {
+  if (uploadType === UPLOAD_TYPES.SELF) {
     containerUrl = getContainerUrl(session, fileObject.type, 'self-fetch');
   } else {
     containerUrl = getContainerUrl(session, 'Documents', 'cross-fetch', otherPodUsername);
@@ -167,14 +170,14 @@ export const uploadDocument = async (session, uploadType, fileObject, otherPodUs
 
   // Guard clause will throw function if container already exist with ttl file
   if (ttlFileExists) {
-    throw new Error('Container already exist. Updating files inside...');
+    throw new Error('Container already exists');
   }
 
   // Place file into Pod container and generate new ttl file for container
   await placeFileInContainer(session, fileObject, containerUrl);
 
   const documentUrl = `${containerUrl}${fileObject.file.name.replace(' ', '%20')}`;
-  const newTtlFile = createResourceTtlFile(fileObject, documentUrl);
+  const newTtlFile = await createResourceTtlFile(fileObject, documentUrl);
 
   let newSolidDataset = createSolidDataset();
   newSolidDataset = setThing(newSolidDataset, newTtlFile);
@@ -189,6 +192,9 @@ export const uploadDocument = async (session, uploadType, fileObject, otherPodUs
   if (uploadType === 'self') {
     // Generate ACL file for container
     await createDocAclForUser(session, containerUrl);
+  }
+  } catch (e) {
+    console.log(e);
   }
 };
 
