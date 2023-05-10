@@ -13,6 +13,7 @@ import {
 } from '@inrupt/solid-client';
 import sha256 from 'crypto-js/sha256'
 import RDF_PREDICATES from '../constants/rdf-predicates';
+import DOCUMENT_TYPES from '../constants/document-types';
 
 /**
  * @typedef {import('@inrupt/solid-client').Access} Access
@@ -153,20 +154,7 @@ export const getContainerUrl = (session, fileType, fetchType, otherPodUsername) 
     POD_URL = `https://${otherPodUsername}.${SOLID_IDENTITY_PROVIDER.split('/')[2]}/`;
   }
 
-  switch (fileType) {
-    case 'Bank Statement':
-      return `${POD_URL}Bank%20Statement/`;
-    case 'Passport':
-      return `${POD_URL}Passport/`;
-    case 'Drivers License':
-      return `${POD_URL}Drivers%20License/`;
-    case 'Users':
-      return `${POD_URL}Users/`;
-    case 'Documents':
-      return `${POD_URL}Documents/`;
-    default:
-      return null;
-  }
+  return fileType ? `${POD_URL}${fileType}/` : null;
 };
 
 /**

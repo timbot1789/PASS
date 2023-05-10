@@ -1,6 +1,5 @@
 import React from 'react';
-import docTypes from '../../utils/form-helper';
-
+import DOCUMENT_TYPES from '../../constants/document-types';
 /**
  * DocumentSelection Component - Sub-component that generates the dropdown
  * box/menu for selecting document type to a user's Solid Pod via Solid Session
@@ -11,8 +10,10 @@ import docTypes from '../../utils/form-helper';
 
 const DocumentSelection = ({ htmlId }) => (
   <select id={htmlId} name="document">
-    {docTypes.map((doc) => (
-      <option key={doc.split(' ')[0]}>{doc}</option>
+    {Object.keys(DOCUMENT_TYPES).map((key) => (
+      <option key={key} value={DOCUMENT_TYPES[key]}>
+        {DOCUMENT_TYPES[key].replace('_',' ')}
+      </option>
     ))}
   </select>
 );

@@ -31,6 +31,7 @@ import {
   SOLID_IDENTITY_PROVIDER
 } from './session-helper';
 
+import DOCUMENT_TYPES from '../constants/document-types';
 import UPLOAD_TYPES from '../constants/upload-types';
 /**
  * @typedef {import('@inrupt/solid-ui-react').SessionContext} Session
@@ -104,11 +105,12 @@ export const setDocAclPermission = async (session, fileType, accessType, otherPo
 export const setDocContainerAclPermission = async (session, accessType, otherPodUsername) => {
   const containerUrl = getContainerUrl(session, 'Documents', 'self-fetch');
   const urlsToSet = [
-    containerUrl,
-    `${containerUrl}Bank%20Statement/`,
-    `${containerUrl}Passport/`,
-    `${containerUrl}Drivers%20License/`
+    containerUrl
   ];
+
+  for (const key in DOCUMENT_TYPES) {
+    urlsToSet.push(DOCUMENT_TYPES[key]);
+  }
 
   const webId = `https://${otherPodUsername}.${
     SOLID_IDENTITY_PROVIDER.split('/')[2]
@@ -154,13 +156,12 @@ export const setDocContainerAclPermission = async (session, accessType, otherPod
  * @returns {Promise} Promise - File upload is handled via Solid libraries
  */
 export const uploadDocument = async (session, uploadType, fileObject, otherPodUsername = '') => {
-  try{
   let containerUrl;
   if (uploadType === UPLOAD_TYPES.SELF) {
     containerUrl = getContainerUrl(session, fileObject.type, 'self-fetch');
   } else {
     containerUrl = getContainerUrl(session, 'Documents', 'cross-fetch', otherPodUsername);
-    containerUrl = `${containerUrl}${fileObject.type.replace(' ', '%20')}/`;
+    containerUrl = `${containerUrl}${fileObject.type}/`;
   }
 
   await createContainerAt(containerUrl, { fetch: session.fetch });
@@ -192,9 +193,6 @@ export const uploadDocument = async (session, uploadType, fileObject, otherPodUs
   if (uploadType === 'self') {
     // Generate ACL file for container
     await createDocAclForUser(session, containerUrl);
-  }
-  } catch (e) {
-    console.log(e);
   }
 };
 
