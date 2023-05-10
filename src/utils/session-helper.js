@@ -6,12 +6,13 @@ import {
   setAgentResourceAccess,
   saveAclFor,
   setAgentDefaultAccess,
+  createThing,
   buildThing,
   setThing,
   saveSolidDatasetAt
 } from '@inrupt/solid-client';
 import sha256 from 'crypto-js/sha256'
-import RDF_PREDICATES from '../constants/rdf_predicates';
+import RDF_PREDICATES from '../constants/rdf-predicates';
 
 /**
  * @typedef {import('@inrupt/solid-client').Access} Access
@@ -269,7 +270,7 @@ export const createResourceTtlFile = (fileObject, documentUrl) => {
     .addStringNoLocale(RDF_PREDICATES.name, fileObject.file.name)
     .addStringNoLocale(RDF_PREDICATES.identifier, fileObject.type)
     .addStringNoLocale(RDF_PREDICATES.endDate, fileObject.date)
-    .addStringNoLocale(RDF_PREDICATES.checksum, checksum)
+    .addStringNoLocale(RDF_PREDICATES.serialNumber, checksum)
     .addStringNoLocale(RDF_PREDICATES.description, fileObject.description)
     .addUrl(RDF_PREDICATES.url, documentUrl)
     .build();

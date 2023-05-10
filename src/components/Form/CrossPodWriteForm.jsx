@@ -5,6 +5,9 @@ import DocumentSelection from './DocumentSelection';
 import { runNotification, updateDocument, uploadDocument } from '../../utils';
 import FormSection from './FormSection';
 import { SelectUserContext } from '../../contexts';
+import { makeHandleFormSubmission } from './formSubmissionHelper'; 
+import UPLOAD_TYPES from '../../constants/upload-types';
+
 
 /**
  * CrossPodWriteForm Component - Component that generates the form for cross pod
@@ -32,7 +35,9 @@ const CrossPodWriteForm = () => {
   // Custom useField hook for handling form inputs
   const { clearValue: clearDescription, _type, ...description } = useField('textarea');
 
-  const clearInputFields = () => {
+  const clearInputFields = (event) => {
+    event.target.uploadDoctype.value = '';
+    event.target.date.value = '';
     clearDescription();
     clearUsername();
     setSelectedUser('');
@@ -41,18 +46,13 @@ const CrossPodWriteForm = () => {
   };
 
   // Event handler for form/document submission to Pod
+
+  const handleFormSubmit = makeHandleFormSubmission(UPLOAD_TYPES.CROSS, state, dispatch, session, clearInputFields)
   const handleCrossPodUpload = async (event) => {
     event.preventDefault();
     dispatch({ type: 'SET_PROCESSING' });
-    const docType = event.target.document.value;
-    const expirationDate = event.target.date.value;
-    const docDescription = event.target.description.value;
-    let podUsername = event.target.crossPodUpload.value;
-
-    if (!podUsername) {
-      podUsername = selectedUser;
-    }
-
+  
+    let podUsername = event.target.crossPodUpload.value || selectedUser;
     if (!podUsername) {
       runNotification('Search failed. Reason: Username not provided.', 5, state, dispatch);
       setTimeout(() => {
@@ -61,71 +61,7 @@ const CrossPodWriteForm = () => {
       return;
     }
 
-    if (!state.file) {
-      runNotification('Submission failed. Reason: missing file', 5, state, dispatch);
-      setTimeout(() => {
-        dispatch({ type: 'CLEAR_PROCESSING' });
-      }, 3000);
-      return;
-    }
-
-    const fileObject = {
-      type: docType,
-      date: expirationDate || 'Not available',
-      description: docDescription || 'No description provided',
-      file: state.file
-    };
-
-    const fileName = fileObject.file.name;
-
-    try {
-      await uploadDocument(session, 'cross', fileObject, podUsername);
-
-      runNotification(`Uploading "${fileName}" to Solid...`, 3, state, dispatch);
-
-      // setTimeout is used to let uploadDocument finish its upload to user's Pod
-      setTimeout(() => {
-        runNotification(`File "${fileName}" uploaded to Solid.`, 5, state, dispatch);
-        setTimeout(() => {
-          event.target.uploadDoctype.value = '';
-          event.target.date.value = '';
-          clearInputFields();
-        }, 3000);
-      }, 3000);
-    } catch {
-      try {
-        const fileExist = await updateDocument(session, 'cross', fileObject, podUsername);
-
-        runNotification('Updating contents in Solid Pod...', 3, state, dispatch);
-
-        if (fileExist) {
-          setTimeout(() => {
-            runNotification(`File "${fileName}" updated on Solid.`, 5, state, dispatch);
-            setTimeout(() => {
-              event.target.uploadDoctype.value = '';
-              event.target.date.value = '';
-              clearInputFields();
-            }, 3000);
-          }, 3000);
-        } else {
-          setTimeout(() => {
-            runNotification(`File "${fileName}" uploaded on Solid.`, 5, state, dispatch);
-            setTimeout(() => {
-              event.target.uploadDoctype.value = '';
-              event.target.date.value = '';
-              clearInputFields();
-            }, 3000);
-          }, 3000);
-        }
-      } catch (error) {
-        runNotification(`Operation failed. Reason: ${error.message}`, 5, state, dispatch);
-        setTimeout(() => {
-          event.target.uploadDoctype.value = '';
-          event.target.date.value = '';
-          clearInputFields();
-        }, 3000);
-      }
-    }
+    handleFormSubmit(event);
   };
 
   const formRowStyle = {
