@@ -111,7 +111,7 @@ const CrossPodWriteForm = () => {
               id="cross-upload-doc"
               size="25"
               name="crossPodUpload"
-              value={username}
+              value={username || selectedUser}
               placeholder={selectedUser}
               label="Upload Document To"
               onChange={handleUsername}

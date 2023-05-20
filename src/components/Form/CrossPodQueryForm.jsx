@@ -52,11 +52,7 @@ const CrossPodQueryForm = () => {
   const handleCrossPodQuery = async (event) => {
     event.preventDefault();
     dispatch({ type: 'SET_PROCESSING' });
-    let podUsername = event.target.crossPodQuery.value;
-
-    if (!podUsername) {
-      podUsername = selectedUser;
-    }
+    const podUsername = username || selectedUser;
 
     if (!podUsername) {
       runNotification('Search failed. Reason: Username not provided.', 5, state, dispatch);
@@ -106,7 +102,7 @@ const CrossPodQueryForm = () => {
               id="cross-search-doc"
               size="25"
               name="crossPodQuery"
-              value={username}
+              value={username || selectedUser}
               placeholder={selectedUser}
               label="Search Document From"
               onChange={handleUsername}

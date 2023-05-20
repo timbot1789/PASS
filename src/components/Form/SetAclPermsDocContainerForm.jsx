@@ -54,11 +54,7 @@ const SetAclPermsDocContainerForm = () => {
     event.preventDefault();
     dispatch({ type: 'SET_PROCESSING' });
     const permissionType = event.target.setAclPerms.value;
-    let podUsername = event.target.setAclTo.value;
-
-    if (!podUsername) {
-      podUsername = selectedUser;
-    }
+    const podUsername = username || selectedUser;
 
     if (!podUsername) {
       runNotification('Set permissions failed. Reason: Username not provided.', 5, state, dispatch);
@@ -128,7 +124,7 @@ const SetAclPermsDocContainerForm = () => {
               id="set-acl-to"
               size="25"
               name="setAclTo"
-              value={username}
+              value={username || selectedUser}
               placeholder={selectedUser}
               label="Set Permission To"
               onChange={handleUsername}
