@@ -132,10 +132,11 @@ const SetAclPermsDocContainerForm = () => {
               placeholder={selectedUser}
               label={selectedUser || 'Set Permission To'}
               onChange={handleUsername}
+              required
             />
           </FormControl>
           <FormControl>
-            <RadioGroup defaultValue="revoke" name="setAclPerms">
+            <RadioGroup defaultValue="Revoke" name="setAclPerms">
               <Box>
                 <FormControlLabel value="Give" label="Give" control={<Radio />} />
                 <FormControlLabel value="Revoke" label="Revoke" control={<Radio />} />

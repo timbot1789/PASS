@@ -146,6 +146,7 @@ const UploadDocumentForm = () => {
               name="uploadDoctype"
               accept=".pdf, .docx, .doc, .txt, .rtf, .gif"
               onChange={handleFileChange}
+              required
             />
             <FormHelperText>
               File to upload: {state.file ? state.file.name : 'No file selected'}

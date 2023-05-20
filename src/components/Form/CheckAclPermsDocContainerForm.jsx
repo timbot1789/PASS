@@ -122,6 +122,7 @@ const CheckAclPermsDocContainerForm = () => {
               placeholder={selectedUser}
               label={selectedUser || 'Username in question'}
               onChange={handleUsername}
+              required
             />
           </FormControl>
           <Button variant="contained" disabled={state.processing} type="submit">
