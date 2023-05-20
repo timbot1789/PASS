@@ -130,7 +130,7 @@ const SetAclPermsDocContainerForm = () => {
               name="setAclTo"
               value={username}
               placeholder={selectedUser}
-              label={selectedUser || 'Set Permission To'}
+              label="Set Permission To"
               onChange={handleUsername}
               required
             />

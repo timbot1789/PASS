@@ -108,7 +108,7 @@ const CrossPodQueryForm = () => {
               name="crossPodQuery"
               value={username}
               placeholder={selectedUser}
-              label={selectedUser || 'Search Document From'}
+              label="Search Document From"
               onChange={handleUsername}
               required
             />

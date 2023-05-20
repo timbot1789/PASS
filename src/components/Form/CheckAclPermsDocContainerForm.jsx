@@ -120,7 +120,7 @@ const CheckAclPermsDocContainerForm = () => {
               name="setAclTo"
               value={username}
               placeholder={selectedUser}
-              label={selectedUser || 'Username in question'}
+              label="Username in question"
               onChange={handleUsername}
               required
             />

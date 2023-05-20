@@ -132,7 +132,7 @@ const SetAclPermissionForm = () => {
               name="setAclTo"
               value={username}
               placeholder={selectedUser}
-              label={selectedUser || 'Set Permissions To'}
+              label="Set Permissions To"
               onChange={handleUsername}
               required
             />

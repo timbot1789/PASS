@@ -113,7 +113,7 @@ const UploadDocumentForm = () => {
               docType={docType}
             />
           </FormControl>
-          <Box sx={{ display: 'flex', gap: 2 }}>
+          <Box>
             <FormControl>
               <InputLabel htmlFor="upload-doc-expiration" />
               <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -138,7 +138,7 @@ const UploadDocumentForm = () => {
               onChange={handleDocDescription}
             />
           </FormControl>
-          <FormControl>
+          <FormControl required>
             <InputLabel htmlFor="upload-doctype" />
             <Input
               id="upload-doctype"
@@ -146,7 +146,6 @@ const UploadDocumentForm = () => {
               name="uploadDoctype"
               accept=".pdf, .docx, .doc, .txt, .rtf, .gif"
               onChange={handleFileChange}
-              required
             />
             <FormHelperText>
               File to upload: {state.file ? state.file.name : 'No file selected'}
