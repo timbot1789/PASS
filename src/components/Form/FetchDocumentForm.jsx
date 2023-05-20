@@ -79,7 +79,7 @@ const FetchDocumentForm = () => {
               htmlId="search-doctype"
               handleDocType={handleDocType}
               docType={docType}
-            />{' '}
+            />
           </FormControl>
           <Button variant="contained" disabled={state.processing} type="submit">
             Get Document
