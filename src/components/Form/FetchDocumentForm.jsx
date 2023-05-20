@@ -1,7 +1,12 @@
 // React Imports
-import React from 'react';
+import React, { useState } from 'react';
 // Inrupt Library Imports
 import { useSession } from '@inrupt/solid-ui-react';
+// Material UI Imports
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 // Utility Imports
 import { getDocuments, runNotification } from '../../utils';
 // Custom Hook Imports
@@ -21,12 +26,16 @@ import FormSection from './FormSection';
 const FetchDocumentForm = () => {
   const { session } = useSession();
   const { state, dispatch } = useStatusNotification();
+  const [docType, setDocType] = useState('');
+
+  const handleDocType = (event) => {
+    setDocType(event.target.value);
+  };
 
   // Event handler for searching/fetching document
   const handleGetDocumentSubmission = async (event) => {
     event.preventDefault();
     dispatch({ type: 'SET_PROCESSING' });
-    const docType = event.target.document.value;
 
     try {
       const documentUrl = await getDocuments(session, docType, 'self-fetch');
@@ -54,10 +63,6 @@ const FetchDocumentForm = () => {
     }
   };
 
-  const formRowStyle = {
-    margin: '20px 0'
-  };
-
   /* eslint-disable jsx-a11y/label-has-associated-control */
   return (
     <FormSection
@@ -67,13 +72,19 @@ const FetchDocumentForm = () => {
       defaultMessage="To be searched..."
     >
       <form onSubmit={handleGetDocumentSubmission} autoComplete="off">
-        <div style={formRowStyle}>
-          <label htmlFor="search-doctype">Select document type to search: </label>
-          <DocumentSelection htmlId="search-doctype" />{' '}
-          <button disabled={state.processing} type="submit">
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 1 }}>
+          <FormControl required>
+            <InputLabel htmlFor="search-doctype">Select Document Type</InputLabel>
+            <DocumentSelection
+              htmlId="search-doctype"
+              handleDocType={handleDocType}
+              docType={docType}
+            />{' '}
+          </FormControl>
+          <Button variant="contained" disabled={state.processing} type="submit">
             Get Document
-          </button>
-        </div>
+          </Button>
+        </Box>
       </form>
     </FormSection>
   );

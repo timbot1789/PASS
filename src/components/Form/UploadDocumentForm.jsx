@@ -105,7 +105,7 @@ const UploadDocumentForm = () => {
               label="Verify File on upload"
             />
           </FormGroup>
-          <FormControl fullWidth required>
+          <FormControl required>
             <InputLabel htmlFor="upload-doc">Select Document Type</InputLabel>
             <DocumentSelection
               htmlId="upload-doc"
@@ -128,7 +128,7 @@ const UploadDocumentForm = () => {
               </LocalizationProvider>
             </FormControl>
           </Box>
-          <FormControl fullWidth>
+          <FormControl>
             <InputLabel htmlFor="upload-doc-desc" />
             <TextField
               id="upload-doc-desc"
@@ -138,7 +138,7 @@ const UploadDocumentForm = () => {
               onChange={handleDocDescription}
             />
           </FormControl>
-          <FormControl fullWidth>
+          <FormControl>
             <InputLabel htmlFor="upload-doctype" />
             <Input
               id="upload-doctype"
