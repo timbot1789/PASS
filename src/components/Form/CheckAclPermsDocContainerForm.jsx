@@ -1,11 +1,17 @@
 // React Imports
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 // Inrupt Library Imports
 import { useSession } from '@inrupt/solid-ui-react';
+// Material UI Imports
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import TextField from '@mui/material/TextField';
 // Utility Imports
 import { SOLID_IDENTITY_PROVIDER, checkContainerPermission, runNotification } from '../../utils';
 // Custom Hook Imports
-import { useField, useStatusNotification } from '../../hooks';
+import { useStatusNotification } from '../../hooks';
 // Context Imports
 import { SelectUserContext } from '../../contexts';
 // Component Imports
@@ -23,11 +29,15 @@ import FormSection from './FormSection';
 const CheckAclPermsDocContainerForm = () => {
   const { session } = useSession();
   const { state, dispatch } = useStatusNotification();
-  const { clearValue: clearUrl, ...user } = useField('text');
+  const [username, setUsername] = useState('');
   const { selectedUser, setSelectedUser } = useContext(SelectUserContext);
 
+  const handleUsername = (event) => {
+    setUsername(event.target.value);
+  };
+
   const clearInputFields = () => {
-    clearUrl();
+    setUsername('');
     setSelectedUser('');
     dispatch({ type: 'CLEAR_PROCESSING' });
   };
@@ -36,7 +46,7 @@ const CheckAclPermsDocContainerForm = () => {
   const handleAclPermission = async (event) => {
     event.preventDefault();
     dispatch({ type: 'SET_PROCESSING' });
-    let podUsername = event.target.setAclTo.value;
+    let podUsername = username;
 
     if (!podUsername) {
       podUsername = selectedUser;
@@ -93,10 +103,6 @@ const CheckAclPermsDocContainerForm = () => {
     }
   };
 
-  const formRowStyle = {
-    margin: '20px 0'
-  };
-
   return (
     <FormSection
       title="Check Permission to Documents Container"
@@ -105,17 +111,23 @@ const CheckAclPermsDocContainerForm = () => {
       defaultMessage="To be set..."
     >
       <form onSubmit={handleAclPermission} autoComplete="off">
-        <div style={formRowStyle}>
-          <label htmlFor="set-acl-to">
-            Check permissions to username&apos;s Documents container:{' '}
-          </label>
-          <br />
-          <br />
-          <input id="set-acl-to" size="25" name="setAclTo" {...user} placeholder={selectedUser} />
-        </div>
-        <button disabled={state.processing} type="submit">
-          Check Permission
-        </button>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 1 }}>
+          <FormControl>
+            <InputLabel htmlFor="set-acl-to" />
+            <TextField
+              id="set-acl-to"
+              size="25"
+              name="setAclTo"
+              value={username}
+              placeholder={selectedUser}
+              label="Username in question"
+              onChange={handleUsername}
+            />
+          </FormControl>
+          <Button variant="contained" disabled={state.processing} type="submit">
+            Check Permission
+          </Button>
+        </Box>
       </form>
     </FormSection>
   );
