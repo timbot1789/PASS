@@ -6,12 +6,18 @@ import { uploadDocument, updateDocument } from './session-core';
  */
 
 /**
+ * @typedef {import("dayjs").Dayjs} Dayjs
+ */
+
+/**
  * Makes a default handleFormSubmission function that can be used
  * by form elements in PASS
  *
  * @memberof utils
  * @function makeHandleFormSubmission
  * @param {string} uploadType - Type of upload (cross, self, etc.) to perform
+ * @param {Dayjs} expireDate - Expiration Date
+ * @param {string} docDescription - Description of Document
  * @param {object} state - current state
  * @param {object} dispatch - dispatch for actions
  * @param {Session} session - current Solid session
@@ -19,7 +25,7 @@ import { uploadDocument, updateDocument } from './session-core';
  * @returns {Function} A function that components can call to submit forms to PASS
  */
 const makeHandleFormSubmission =
-  (uploadType, state, dispatch, session, clearInputFields) =>
+  (uploadType, expireDate, docDescription, state, dispatch, session, clearInputFields) =>
   async (event, crossPodUsername = '') => {
     event.preventDefault();
     dispatch({ type: 'SET_PROCESSING' });
@@ -32,10 +38,12 @@ const makeHandleFormSubmission =
       return;
     }
 
+    const formattedDate = expireDate ? expireDate.format('MM/DD/YYYY') : 'No Date Provided';
+
     const fileObject = {
       type: event.target.document.value,
-      date: event.target.date.value,
-      description: event.target.description.value,
+      date: formattedDate,
+      description: docDescription || 'No Description Provided',
       file: state.file
     };
 
