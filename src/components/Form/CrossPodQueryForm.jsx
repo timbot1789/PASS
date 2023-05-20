@@ -1,11 +1,17 @@
 // React Imports
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 // Inrupt Library Imports
 import { useSession } from '@inrupt/solid-ui-react';
+// Material UI Imports
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import TextField from '@mui/material/TextField';
 // Utility Imports
 import { getDocuments, runNotification } from '../../utils';
 // Custom Hook Imports
-import { useField, useStatusNotification } from '../../hooks';
+import { useStatusNotification } from '../../hooks';
 // Context Imports
 import { SelectUserContext } from '../../contexts';
 // Component Imports
@@ -23,12 +29,21 @@ import FormSection from './FormSection';
 const CrossPodQueryForm = () => {
   const { session } = useSession();
   const { state, dispatch } = useStatusNotification();
-  const { clearValue: clearUsername, ...username } = useField('text');
+  const [username, setUsername] = useState('');
   const { selectedUser, setSelectedUser } = useContext(SelectUserContext);
+  const [docType, setDocType] = useState('');
+
+  const handleUsername = (event) => {
+    setUsername(event.target.value);
+  };
+
+  const handleDocType = (event) => {
+    setDocType(event.target.value);
+  };
 
   // Clean up function for clearing input fields after submission
   const clearInputFields = () => {
-    clearUsername();
+    setUsername('');
     setSelectedUser('');
     dispatch({ type: 'CLEAR_PROCESSING' });
   };
@@ -37,7 +52,6 @@ const CrossPodQueryForm = () => {
   const handleCrossPodQuery = async (event) => {
     event.preventDefault();
     dispatch({ type: 'SET_PROCESSING' });
-    const docType = event.target.document.value;
     let podUsername = event.target.crossPodQuery.value;
 
     if (!podUsername) {
@@ -76,10 +90,6 @@ const CrossPodQueryForm = () => {
     }
   };
 
-  const formRowStyle = {
-    margin: '20px 0'
-  };
-
   /* eslint-disable jsx-a11y/label-has-associated-control */
   return (
     <FormSection
@@ -89,25 +99,32 @@ const CrossPodQueryForm = () => {
       defaultMessage="To be searched..."
     >
       <form onSubmit={handleCrossPodQuery} autoComplete="off">
-        <div style={formRowStyle}>
-          <label htmlFor="cross-search-doc">Search document from username: </label>
-          <br />
-          <br />
-          <input
-            id="cross-search-doc"
-            size="25"
-            name="crossPodQuery"
-            {...username}
-            placeholder={selectedUser}
-          />
-        </div>
-        <div style={formRowStyle}>
-          <label htmlFor="cross-search-doctype">Select document type to search: </label>
-          <DocumentSelection htmlId="cross-search-doctype" />{' '}
-          <button disabled={state.processing} type="submit">
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 1 }}>
+          <FormControl>
+            <InputLabel htmlFor="cross-search-doc" />
+            <TextField
+              id="cross-search-doc"
+              size="25"
+              name="crossPodQuery"
+              value={username}
+              placeholder={selectedUser}
+              label={selectedUser || 'Search Document From'}
+              onChange={handleUsername}
+              required
+            />
+          </FormControl>
+          <FormControl required>
+            <InputLabel htmlFor="cross-search-doctype">Select Document Type</InputLabel>
+            <DocumentSelection
+              htmlId="cross-search-doctype"
+              handleDocType={handleDocType}
+              docType={docType}
+            />
+          </FormControl>
+          <Button variant="contained" disabled={state.processing} type="submit">
             Search Pod
-          </button>
-        </div>
+          </Button>
+        </Box>
       </form>
     </FormSection>
   );
