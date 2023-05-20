@@ -1,7 +1,16 @@
 // React Imports
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 // Inrupt Library Imports
 import { useSession } from '@inrupt/solid-ui-react';
+// Material UI Imports
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import InputLabel from '@mui/material/InputLabel';
+import TextField from '@mui/material/TextField';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
 // Utility Imports
 import {
   SOLID_IDENTITY_PROVIDER,
@@ -9,7 +18,7 @@ import {
   setDocContainerAclPermission
 } from '../../utils';
 // Custom Hook Imports
-import { useField, useStatusNotification } from '../../hooks';
+import { useStatusNotification } from '../../hooks';
 // Context Imports
 import { SelectUserContext } from '../../contexts';
 // Component Imports
@@ -27,11 +36,15 @@ import FormSection from './FormSection';
 const SetAclPermsDocContainerForm = () => {
   const { session } = useSession();
   const { state, dispatch } = useStatusNotification();
-  const { clearValue: clearUsername, ...username } = useField('text');
+  const [username, setUsername] = useState('');
   const { selectedUser, setSelectedUser } = useContext(SelectUserContext);
 
+  const handleUsername = (event) => {
+    setUsername(event.target.value);
+  };
+
   const clearInputFields = () => {
-    clearUsername();
+    setUsername('');
     setSelectedUser('');
     dispatch({ type: 'CLEAR_PROCESSING' });
   };
@@ -99,10 +112,6 @@ const SetAclPermsDocContainerForm = () => {
     }
   };
 
-  const formRowStyle = {
-    margin: '20px 0'
-  };
-
   /* eslint-disable jsx-a11y/label-has-associated-control */
   return (
     <FormSection
@@ -112,28 +121,31 @@ const SetAclPermsDocContainerForm = () => {
       defaultMessage="To be set..."
     >
       <form onSubmit={handleAclPermission} autoComplete="off">
-        <div style={formRowStyle}>
-          <label htmlFor="set-acl-to">Set permissions to username: </label>
-          <br />
-          <br />
-          <input
-            id="set-acl-to"
-            size="25"
-            name="setAclTo"
-            {...username}
-            placeholder={selectedUser}
-          />
-        </div>
-        <div style={formRowStyle}>
-          <p>Select permission setting:</p>
-          <input type="radio" id="set-acl-perm-give" name="setAclPerms" value="Give" />
-          <label htmlFor="set-acl-perm-give">Give</label>
-          <input type="radio" id="set-acl-perm-revoke" name="setAclPerms" value="Revoke" />
-          <label htmlFor="set-acl-perm-revoke">Revoke</label>
-        </div>
-        <button disabled={state.processing} type="submit">
-          Set Permission
-        </button>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 1 }}>
+          <FormControl>
+            <InputLabel htmlFor="set-acl-to" />
+            <TextField
+              id="set-acl-to"
+              size="25"
+              name="setAclTo"
+              value={username}
+              placeholder={selectedUser}
+              label={selectedUser || 'Set Permission To'}
+              onChange={handleUsername}
+            />
+          </FormControl>
+          <FormControl>
+            <RadioGroup defaultValue="revoke" name="setAclPerms">
+              <Box>
+                <FormControlLabel value="Give" label="Give" control={<Radio />} />
+                <FormControlLabel value="Revoke" label="Revoke" control={<Radio />} />
+              </Box>
+            </RadioGroup>
+          </FormControl>
+          <Button variant="contained" disabled={state.processing} type="submit">
+            Set Permission
+          </Button>
+        </Box>
       </form>
     </FormSection>
   );
