@@ -8,42 +8,10 @@
  * @namespace utils
  */
 
-import docTypes from './frontend/form-helper';
-import runNotification from './frontend/notification-helper';
-import {
-  uploadDocument,
-  updateDocument,
-  getDocuments,
-  deleteDocumentFile,
-  setDocAclPermission,
-  createDocumentContainer,
-  setDocContainerAclPermission,
-  checkContainerPermission,
-  sendMessageTTL,
-  createOutbox,
-  getMessageTTL,
-  createPublicContainer,
-  createInbox
-} from './network/session-core';
-import { getPodUrl } from './network/session-helper';
 import makeHandleFormSubmission from './frontend/FormSubmissionHelper';
+import docTypes from './frontend/form-helper'
 
-export {
-  docTypes,
-  runNotification,
-  uploadDocument,
-  updateDocument,
-  getDocuments,
-  deleteDocumentFile,
-  setDocAclPermission,
-  createDocumentContainer,
-  setDocContainerAclPermission,
-  checkContainerPermission,
-  sendMessageTTL,
-  makeHandleFormSubmission,
-  createOutbox,
-  getMessageTTL,
-  createPublicContainer,
-  createInbox,
-  getPodUrl
-};
+export * from './frontend/notification-helper';
+export * from './network/session-core';
+export * from './network/session-helper';
+export { makeHandleFormSubmission, docTypes };

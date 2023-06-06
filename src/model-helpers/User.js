@@ -6,7 +6,6 @@ import {
   getSolidDataset,
   createSolidDataset,
   getDatetime,
-  getPodUrlAll,
   getStringNoLocale,
   getUrl,
   getThing
@@ -115,30 +114,22 @@ const loadUserActivity = async (podUrl, session) => {
  *
  * @memberof User
  * @function createUser
- * @param {Session} session - Solid's Session Object {@link Session}
  * @param {object} userSubmission - an object from a form submission containing the user creation data
+ * @param {Session} session - Solid's Session Object {@link Session}
  * @returns {Promise<object>} Promise - Updates last active time of user to lastActive.ttl
  */
-export const createUser = async (session, userSubmission) => {
-  const { familyName, username, givenName, webId } = userSubmission;
+export const createUser = (userSubmission, session) => {
+  const { familyName, username, givenName, webId, podUrl } = userSubmission;
 
-  let newUserPodUrl = null;
-  try {
-    [newUserPodUrl] = await getPodUrlAll(webId);
-  } catch {
-    [newUserPodUrl] = webId.split('profile');
-  }
-  newUserPodUrl = newUserPodUrl || webId.split('profile')[0];
-
-  const dateModified = await loadUserActivity(newUserPodUrl, session);
+  loadUserActivity(podUrl, session);
 
   return {
     familyName,
     username,
     givenName,
     webId,
-    dateModified,
-    podUrl: newUserPodUrl
+    dateModified: null,
+    podUrl
   };
 };
 
