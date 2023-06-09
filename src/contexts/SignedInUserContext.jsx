@@ -34,8 +34,7 @@ export const SignedInUserContextProvider = ({ children }) => {
 
   const userInfoMemo = useMemo(
     () => ({
-      podUrl: userInfo.podUrl,
-      
+      podUrl: userInfo.podUrl
     }),
     [userInfo, loadingUserInfo]
   );
